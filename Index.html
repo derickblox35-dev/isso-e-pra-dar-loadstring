@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>r9blox script</title>
+</head>
+<body>
+  <h1>
+    local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Limpeza preventiva
+if playerGui:FindFirstChild("ZombieStrideGui") then
+    playerGui.ZombieStrideGui:Destroy()
+end
+
+local gui = Instance.new("ScreenGui", playerGui)
+gui.Name = "ZombieStrideGui"
+gui.ResetOnSpawn = false
+
+-- Criar o objeto de som único (isso evita o acúmulo)
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://1131937949"
+sound.Parent = player.Character:WaitForChild("Head") -- Som na cabeça
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 160, 0, 200)
+frame.Position = UDim2.new(0.5, 0, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(45, 0, 60)
+frame.Active = true
+frame.Draggable = true
+frame.Visible = true
+
+local stroke = Instance.new("UIStroke", frame)
+stroke.Color = Color3.fromRGB(150, 0, 255)
+stroke.Thickness = 2
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0.2, 0)
+title.Text = "Zombie Stride Client"
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Parent = frame
+
+local currentTrack = nil
+local activeId = nil
+
+local function playCustom(animId)
+    -- Se clicou na mesma, apenas para tudo
+    if activeId == animId then
+        if currentTrack then currentTrack:Stop() end
+        sound:Stop()
+        currentTrack = nil
+        activeId = nil
+        return
+    end
+
+    -- Para o som e animação anteriores instantaneamente
+    if currentTrack then currentTrack:Stop() end
+    sound:Stop()
+
+    local char = player.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    local animator = hum and (hum:FindFirstChild("Animator") or Instance.new("Animator", hum))
+    
+    if animator then
+        local anim = Instance.new("Animation")
+        anim.AnimationId = animId
+        currentTrack = animator:LoadAnimation(anim)
+        currentTrack.Priority = Enum.AnimationPriority.Action4
+        currentTrack:Play()
+        
+        -- Inicia o som único
+        sound:Play()
+        activeId = animId
+    end
+end
+
+-- Botões
+local function createBtn(text, id, posY)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0.8, 0, 0.2, 0)
+    btn.Position = UDim2.new(0.1, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(80, 0, 120)
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Parent = frame
+    btn.MouseButton1Click:Connect(function() playCustom(id) end)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+end
+
+createBtn("Animação A", "rbxassetid://125497596837433", 45)
+createBtn("Animação B", "rbxassetid://84248734120911", 95)
+createBtn("Animação C", "rbxassetid://73383479205643", 145)
+
+  </h1>
+</body>
+</html>
